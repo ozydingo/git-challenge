@@ -1,2 +1,2 @@
-first hint
-second hint
+Try an interactive rebase
+Each line of an interactive rebase specifies an action for git to take. You have full control over this list actions.

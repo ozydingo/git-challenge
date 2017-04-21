@@ -1,0 +1,36 @@
+#$/usr/bin/env bash
+HINTDIR=".hints"
+HINTFILE="${HINTDIR}/hints.lst"
+
+ind="$1"
+shift
+
+branch=$(git status | grep -E 'On branch' | head -1 | ruby -ne 'puts /branch (.*)/i =~ $_ && $1 || "__none"')
+
+[ -d .hints ] || mkdir .hints
+hint_index_file=".hints/${branch}.num"
+
+if [ "$ind" = reset ]; then
+  echo 1 > $hint_index_file
+  echo "Hint reset."
+  exit 0
+elif [ -n "$ind" ]; then
+  hint_num=$(echo $ind | head -1 | ruby -ne 'puts $_.to_i')
+else
+  hint_num=1
+  [ -f $hint_index_file ] && hint_num=$(cat $hint_index_file | head -1 | ruby -ne 'puts $_.to_i')
+fi
+
+if [ ! -f $HINTFILE ]; then
+  echo "Sorry, there are no hints for thie exercise!"
+  exit 0
+fi
+
+hint=$(cat $HINTFILE | sed -n ${hint_num}p)
+
+if [ -n "$hint" ]; then
+  echo $hint
+  echo $(($hint_num + 1)) > $hint_index_file
+else
+  echo "No hints left!"
+fi
